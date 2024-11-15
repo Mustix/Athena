@@ -1,4 +1,4 @@
-import { FallingLines } from "react-loader-spinner";
+import { RotatingLines } from "react-loader-spinner";
 
 export default function Button({
   loading,
@@ -15,7 +15,14 @@ export default function Button({
     >
       {loading ? (
         <>
-          <FallingLines color="#FFFFFF" width="90" height="90" />
+          <RotatingLines
+            visible={true}
+            width="20"
+            strokeColor=" white"
+            strokeWidth="5"
+            animationDuration="0.75"
+            ariaLabel="rotating-lines-loading"
+          />
           Loading...
         </>
       ) : (

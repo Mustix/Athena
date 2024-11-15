@@ -1,187 +1,216 @@
-//athena\app\components\PatientView.tsx
-"use client";
+import React, { useState } from "react";
+import {
+  ChevronDown,
+  ChevronUp,
+  AlertCircle,
+  Phone,
+  Mail,
+  Calendar,
+  FileText,
+} from "lucide-react";
 
-import React from "react";
+const PatientView = ({ data }: { data: any }) => {
+  const [expandedSections, setExpandedSections] = useState<
+    Record<string, boolean>
+  >({});
+  console.log(data[0]);
 
-interface GroupedData {
-  basicInfo: Record<string, any>;
-  contactInfo: Record<string, any>;
-  clinicalInfo: Record<string, any>;
-  preferences: Record<string, any>;
-  other: Record<string, any>;
-}
-
-export default function PatientView({ data }: { data: any }) {
-  const getMissingFields = (rawData: any): string[] => {
-    const missingFields: string[] = [];
-
-    // Get values
-    const patientId = rawData[0]?.patientid;
-    const firstName = rawData[0]?.firstname;
-    const lastName = rawData[0]?.lastname;
-    const dob = rawData[0]?.dob;
-    const mobilePhone = rawData[0]?.mobilephone;
-    const email = rawData[0]?.email;
-    const departmentId = rawData[0]?.departmentid;
-    const primaryDepartmentId = rawData[0]?.primarydepartmentid;
-
-    // Production validation checks
-    if (patientId === null || patientId === undefined) {
-      missingFields.push("Patient ID");
-    }
-    if (firstName === null || firstName === undefined) {
-      missingFields.push("First Name");
-    }
-    if (lastName === null || lastName === undefined) {
-      missingFields.push("Last Name");
-    }
-    if (dob === null || dob === undefined) {
-      missingFields.push("Date of Birth");
-    }
-    if (mobilePhone === null || mobilePhone === undefined) {
-      missingFields.push("Mobile Phone");
-    }
-    if (email === null || email === undefined) {
-      missingFields.push("Email");
-    }
-    if (departmentId === null || departmentId === undefined) {
-      missingFields.push("Department ID");
-    }
-    if (primaryDepartmentId === null || primaryDepartmentId === undefined) {
-      missingFields.push("Primary Department ID");
-    }
-
-    return missingFields;
+  const toggleSection = (section: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
   };
 
-  const groupData = (rawData: any): GroupedData => {
-    const grouped: GroupedData = {
-      basicInfo: {},
-      contactInfo: {},
-      clinicalInfo: {},
-      preferences: {},
-      other: {},
-    };
+  // Move this to the top
+  const requiredFields = [
+    { field: "patientId", name: "Patient ID" },
+    { field: "firstName", name: "First Name" },
+    { field: "lastName", name: "Last Name" },
+    { field: "dob", name: "Date of Birth" },
+    { field: "mobilePhone", name: "Mobile Phone" },
+    { field: "email", name: "Email" },
+    { field: "departmentId", name: "Department ID" },
+    { field: "primaryDepartmentId", name: "Primary Department ID" },
+  ];
 
-    const mappings = {
-      basicInfo: [
-        "firstName",
-        "lastName",
-        "email",
-        "address",
-        "city",
-        "zip",
-        "sex",
-        "dob",
-      ],
-      contactInfo: ["homephone", "mobilephone", "contactpreference"],
-      clinicalInfo: [
-        "patientid",
-        "departmentlist",
-        "status",
-        "lastupdated",
-        "departmentid",
-        "primarydepartmentid",
-      ],
-      preferences: ["portalTermsOnFile", "emailExists", "consentPresent"],
-    };
-
-    Object.entries(rawData[0]).forEach(([key, value]) => {
-      const lowerKey = key.toLowerCase();
-      let placed = false;
-
-      for (const [category, fields] of Object.entries(mappings)) {
-        if (fields.some((field) => lowerKey.includes(field.toLowerCase()))) {
-          grouped[category as keyof GroupedData][key] = value;
-          placed = true;
-          break;
-        }
-      }
-
-      if (!placed) {
-        grouped.other[key] = value;
-      }
-    });
-
-    return grouped;
-  };
-
+  /*  requiredFields.forEach(({ field, name }) => {
+    if (field === null || field === undefined) {
+      missingFields.push(name);
+    } 
+  });*/
   const formatValue = (value: any): string => {
+    if (value === null || value === undefined) return "Not provided";
     if (typeof value === "boolean") return value ? "Yes" : "No";
-    if (typeof value === "object") return JSON.stringify(value, null, 2);
+    if (Array.isArray(value)) return value.join(", ");
+    if (typeof value === "object") {
+      if (value instanceof Date) return value.toLocaleDateString();
+      return JSON.stringify(value, null, 2);
+    }
     return String(value);
   };
 
-  const formatLabel = (key: string): string => {
+  const formatKey = (key: string): string => {
     return key
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
-      .replace(/_/g, " ");
+      .replace(/_/g, " ")
+      .trim();
   };
 
-  const groupedData = groupData(data);
-  const missingFields = getMissingFields(data);
+  const getStatusColor = (value: string) => {
+    const status = value.toString().toLowerCase();
+    if (status.includes("active")) return "bg-green-100 text-green-800";
+    if (status.includes("pending")) return "bg-yellow-100 text-yellow-800";
+    if (status.includes("inactive") || status.includes("error"))
+      return "bg-red-100 text-red-800";
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const renderValue = (key: string, value: any) => {
+    const isStatus = key.toLowerCase().includes("status");
+    const isEmail = key.toLowerCase().includes("email");
+    const isPhone = key.toLowerCase().includes("phone");
+    const isDate =
+      key.toLowerCase().includes("date") ||
+      key.toLowerCase().includes("updated") ||
+      key.toLowerCase().includes("modified");
+
+    if (isStatus) {
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-sm ${getStatusColor(value)}`}
+        >
+          {formatValue(value)}
+        </span>
+      );
+    }
+
+    if (isEmail && value) {
+      return (
+        <a
+          href={`mailto:${value}`}
+          className="text-blue-600 hover:underline flex items-center gap-2"
+        >
+          <Mail className="w-4 h-4" />
+          {formatValue(value)}
+        </a>
+      );
+    }
+
+    if (isPhone && value) {
+      return (
+        <a
+          href={`tel:${value}`}
+          className="text-blue-600 hover:underline flex items-center gap-2"
+        >
+          <Phone className="w-4 h-4" />
+          {formatValue(value)}
+        </a>
+      );
+    }
+
+    if (isDate && value) {
+      return (
+        <span className="flex items-center gap-2">
+          <Calendar className="w-4 h-4" />
+          {new Date(value).toLocaleString()}
+        </span>
+      );
+    }
+
+    return formatValue(value);
+  };
+
+  const sections = Object.entries(data[0] || {}).reduce(
+    (acc: Record<string, Record<string, any>>, [key, value]) => {
+      const section =
+        key.toLowerCase().includes("date") ||
+        key.toLowerCase().includes("updated")
+          ? "Timestamps"
+          : key.toLowerCase().includes("phone") ||
+            key.toLowerCase().includes("email") ||
+            key.toLowerCase().includes("address")
+          ? "Contact"
+          : key.toLowerCase().includes("status")
+          ? "Status"
+          : key.toLowerCase().includes("id")
+          ? "Identifiers"
+          : "General Information";
+
+      if (!acc[section]) acc[section] = {};
+      acc[section][key] = value;
+      return acc;
+    },
+    {}
+  );
+
+  if (!data?.length) {
+    return (
+      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-3">
+        <AlertCircle className="w-5 h-5 text-red-500" />
+        <span className="text-red-700">No patient data available</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {missingFields.length > 0 && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-red-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Missing Required Information
-              </h3>
-              <div className="mt-2 text-sm text-red-700">
-                Please check the following fields:
-                <ul className="list-disc pl-4 mt-1">
-                  {missingFields.map((field) => (
-                    <li key={field}>{field}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="space-y-4">
+      {requiredFields.map(({ field, name }) => {
+        const item = Object.entries(data[0]).find(([key, value]) => {
+          return key.toLowerCase() === field.toLowerCase();
+        });
 
-      {Object.entries(groupedData).map(
-        ([section, sectionData]) =>
-          Object.keys(sectionData).length > 0 && (
-            <div key={section} className="bg-white rounded-lg shadow">
-              <h2 className="text-lg font-semibold p-4 bg-gray-50 rounded-t-lg border-b">
-                {formatLabel(section)}
-              </h2>
-              <div className="divide-y">
+        if (item) {
+          return (
+            <div key={field}>
+              {name} {item[1]}
+            </div>
+          );
+        } else {
+          return null;
+        }
+      })}
+      {Object.entries(sections).map(([section, sectionData]) => (
+        <div
+          key={section}
+          className="bg-white rounded-lg shadow-sm border border-gray-200"
+        >
+          <button
+            onClick={() => toggleSection(section)}
+            className="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50"
+          >
+            <h2 className="text-lg font-medium text-gray-900">{section}</h2>
+            {expandedSections[section] ? (
+              <ChevronUp className="w-5 h-5 text-gray-500" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-gray-500" />
+            )}
+          </button>
+
+          {expandedSections[section] && (
+            <div className="px-4 pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries(sectionData).map(([key, value]) => (
                   <div
                     key={key}
-                    className="p-4 flex justify-between hover:bg-gray-50"
+                    className="flex flex-col p-3 rounded-lg bg-gray-50"
                   >
-                    <div className="font-medium text-gray-700">
-                      {formatLabel(key)}
-                    </div>
-                    <div className="text-gray-900 ml-4">
-                      {formatValue(value)}
+                    <span className="text-sm text-gray-500">
+                      {formatKey(key)}
+                    </span>
+                    <div className="mt-1 text-gray-900">
+                      {renderValue(key, value)}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          )
-      )}
+          )}
+        </div>
+      ))}
     </div>
   );
-}
+};
+
+export default PatientView;
