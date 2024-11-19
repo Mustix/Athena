@@ -1,10 +1,10 @@
 "use client";
 // To:DO Add title
-
+import styles from "./Home.module.css";
 import React, { useState } from "react";
-import PatientView from "@/app/components/PatientView";
-
-import Button from "./components/Button";
+import PatientView from "@/app/components/patientView/PatientView";
+import { Input } from "@/app/components/input/Input";
+import Button from "./components/button/Button";
 
 export default function AthenaPage() {
   const [athenaId, setAthenaId] = useState("3746");
@@ -41,21 +41,17 @@ export default function AthenaPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Athena Patient Data</h1>
+      <h1 className={styles.headerStyle}>Athena Patient Data</h1>
 
-      <form onSubmit={handleSubmit} className="mb-6">
-        <div className="flex gap-4">
-          <label className="flex items-center">
-            <span className="mr-2">ATHENA_ID:</span>
-            <input
-              type="text"
-              value={athenaId}
-              onChange={(e) => setAthenaId(e.target.value)}
-              className="px-3 py-1 border rounded"
-            />
-          </label>
-          <Button content="Fetch Data" loading={loading} />
-        </div>
+      <form className={styles.patientForm} onSubmit={handleSubmit}>
+        <Input
+          label="AthenaID"
+          type="text"
+          value={athenaId}
+          onChange={(e) => setAthenaId(e.target.value)}
+        />
+
+        <Button content="Fetch Data" loading={loading} />
       </form>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}

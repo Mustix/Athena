@@ -1,0 +1,14 @@
+.patientContainer {
+  display: flex;
+  margin-top: 50px;
+  gap: 20px;
+}
+.accordeon {
+  margin-top: 52px;
+}
+.accordeon > div {
+  margin-bottom: 12px;
+}
+.patientContainer > div {
+  flex: 1;
+}

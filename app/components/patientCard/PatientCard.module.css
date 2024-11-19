@@ -1,0 +1,36 @@
+.patientCard {
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+.patientCard h3 {
+  font-size: 28px;
+  font-weight: 300;
+  margin-bottom: 12px;
+}
+.list li.top {
+  font-weight: 700;
+}
+.box {
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid rgb(9 9 9 / 0.15);
+  padding: 20px;
+}
+ul.list li {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 300;
+  border-bottom: 1px solid rgb(9 9 9 / 0.1);
+  padding: 8px;
+}
+.list > li > span:first-child {
+  font-size: 15px;
+  color: #504f4e;
+}
+
+.list > li > span:last-child {
+  text-align: right;
+  color: #090909;
+  font-size: 18px;
+}

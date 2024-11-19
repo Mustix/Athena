@@ -1,5 +1,5 @@
 import { RotatingLines } from "react-loader-spinner";
-
+import styles from "./Button.module.css";
 export default function Button({
   loading,
   content,
@@ -8,11 +8,7 @@ export default function Button({
   content: string;
 }) {
   return (
-    <button
-      type="submit"
-      disabled={loading}
-      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 flex items-center gap-2"
-    >
+    <button type="submit" disabled={loading} className={styles.button}>
       {loading ? (
         <>
           <RotatingLines
