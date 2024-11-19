@@ -45,7 +45,7 @@ export default function AthenaPage() {
 
       <form className={styles.patientForm} onSubmit={handleSubmit}>
         <Input
-          label="AthenID"
+          label="AthenaID"
           type="text"
           value={athenaId}
           onChange={(e) => setAthenaId(e.target.value)}
