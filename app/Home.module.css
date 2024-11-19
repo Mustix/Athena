@@ -58,3 +58,16 @@
   background-color: #f9fafb;
   font-weight: 600;
 }
+.headerStyle {
+  font-size: 45px;
+  line-height: 50px;
+  color: #090909;
+  margin-bottom: 32px;
+  text-align: center;
+}
+.patientForm {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 7px;
+}

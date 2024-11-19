@@ -9,6 +9,8 @@ import {
   FileText,
 } from "lucide-react";
 
+import PatientCard from "../patientCard/PatientCard";
+import styles from "./PatientView.module.css";
 const PatientView = ({ data }: { data: any }) => {
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
@@ -23,16 +25,6 @@ const PatientView = ({ data }: { data: any }) => {
   };
 
   // Move this to the top
-  const requiredFields = [
-    { field: "patientId", name: "Patient ID" },
-    { field: "firstName", name: "First Name" },
-    { field: "lastName", name: "Last Name" },
-    { field: "dob", name: "Date of Birth" },
-    { field: "mobilePhone", name: "Mobile Phone" },
-    { field: "email", name: "Email" },
-    { field: "departmentId", name: "Department ID" },
-    { field: "primaryDepartmentId", name: "Primary Department ID" },
-  ];
 
   /*  requiredFields.forEach(({ field, name }) => {
     if (field === null || field === undefined) {
@@ -42,7 +34,7 @@ const PatientView = ({ data }: { data: any }) => {
   const formatValue = (value: any): string => {
     if (value === null || value === undefined) return "Not provided";
     if (typeof value === "boolean") return value ? "Yes" : "No";
-    if (Array.isArray(value)) return value.join(", ");
+    if (Array.isArray(value)) return JSON.stringify(value, null, 2);
     if (typeof value === "object") {
       if (value instanceof Date) return value.toLocaleDateString();
       return JSON.stringify(value, null, 2);
@@ -69,8 +61,10 @@ const PatientView = ({ data }: { data: any }) => {
 
   const renderValue = (key: string, value: any) => {
     const isStatus = key.toLowerCase().includes("status");
-    const isEmail = key.toLowerCase().includes("email");
-    const isPhone = key.toLowerCase().includes("phone");
+    const isEmail =
+      key.toLowerCase().includes("email") && typeof value === "string";
+    const isPhone =
+      key.toLowerCase().includes("phone") && typeof value === "string";
     const isDate =
       key.toLowerCase().includes("date") ||
       key.toLowerCase().includes("updated") ||
@@ -155,60 +149,48 @@ const PatientView = ({ data }: { data: any }) => {
   }
 
   return (
-    <div className="space-y-4">
-      {requiredFields.map(({ field, name }) => {
-        const item = Object.entries(data[0]).find(([key, value]) => {
-          return key.toLowerCase() === field.toLowerCase();
-        });
-
-        if (item) {
-          return (
-            <div key={field}>
-              {name} {item[1]}
-            </div>
-          );
-        } else {
-          return null;
-        }
-      })}
-      {Object.entries(sections).map(([section, sectionData]) => (
-        <div
-          key={section}
-          className="bg-white rounded-lg shadow-sm border border-gray-200"
-        >
-          <button
-            onClick={() => toggleSection(section)}
-            className="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50"
+    <div className={styles.patientContainer}>
+      <PatientCard data={data[0]} />
+      <div className={styles.accordeon}>
+        {Object.entries(sections).map(([section, sectionData]) => (
+          <div
+            key={section}
+            className="bg-white rounded-lg shadow-sm border border-gray-200"
           >
-            <h2 className="text-lg font-medium text-gray-900">{section}</h2>
-            {expandedSections[section] ? (
-              <ChevronUp className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-500" />
-            )}
-          </button>
+            <button
+              onClick={() => toggleSection(section)}
+              className="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50"
+            >
+              <h2 className="text-lg font-medium text-gray-900">{section}</h2>
+              {expandedSections[section] ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </button>
 
-          {expandedSections[section] && (
-            <div className="px-4 pb-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(sectionData).map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex flex-col p-3 rounded-lg bg-gray-50"
-                  >
-                    <span className="text-sm text-gray-500">
-                      {formatKey(key)}
-                    </span>
-                    <div className="mt-1 text-gray-900">
-                      {renderValue(key, value)}
+            {expandedSections[section] && (
+              <div className="px-4 pb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(sectionData).map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex flex-col p-3 rounded-lg bg-gray-50"
+                    >
+                      <span className="text-sm text-gray-500 break-all">
+                        {formatKey(key)}
+                      </span>
+                      <div className="mt-1 text-gray-900 break-all">
+                        {renderValue(key, value)}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
