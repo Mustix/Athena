@@ -141,7 +141,7 @@ const PatientView = ({ data }: { data: any }) => {
 
   if (!data?.length) {
     return (
-      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-3">
+      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-5">
         <AlertCircle className="w-5 h-5 text-red-500" />
         <span className="text-red-700">No patient data available</span>
       </div>
