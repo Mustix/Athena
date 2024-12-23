@@ -1,14 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
-/* 
-To do : add patient medical info, height, weight, gender, blood pressure.
-
-clean cache
- */
-
-=======
->>>>>>> 964cc9f (works properly now)
 import styles from "./Home.module.css";
 import React, { useState } from "react";
 import PatientView from "@/app/components/patientView/PatientView";
