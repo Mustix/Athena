@@ -1,17 +1,11 @@
 "use client";
 
-<<<<<<< HEAD
 /* 
 To do : add patient medical info, height, weight, gender, blood pressure.
 
 clean cache
  */
-<<<<<<< HEAD
 
-=======
-=======
->>>>>>> a7c38ab (Add reset cache)
->>>>>>> 71e3705c2ec95f60a619e3077d5993a3a61535dc
 import styles from "./Home.module.css";
 import React, { useState } from "react";
 import PatientView from "@/app/components/patientView/PatientView";
