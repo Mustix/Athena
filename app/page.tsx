@@ -1,8 +1,11 @@
 "use client";
 
+<<<<<<< HEAD
 /* 
 To do : add patient medical info, height, weight, gender, blood pressure.
  */
+=======
+>>>>>>> a7c38ab (Add reset cache)
 import styles from "./Home.module.css";
 import React, { useState } from "react";
 import PatientView from "@/app/components/patientView/PatientView";
@@ -22,7 +25,22 @@ export default function AthenaPage() {
     setData(null);
 
     try {
-      const res = await fetch(`./api/getToken?athenaId=${athenaId}`);
+      // Add timestamp to prevent caching
+      const timestamp = new Date().getTime();
+      const res = await fetch(
+        `./api/getToken?athenaId=${athenaId}&t=${timestamp}`,
+        {
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+          // Force reload
+          cache: "no-store",
+          next: { revalidate: 0 },
+        }
+      );
+
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || "An error occurred");
