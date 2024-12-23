@@ -2,7 +2,10 @@
 
 /* 
 To do : add patient medical info, height, weight, gender, blood pressure.
+
+clean cache
  */
+
 import styles from "./Home.module.css";
 import React, { useState } from "react";
 import PatientView from "@/app/components/patientView/PatientView";
